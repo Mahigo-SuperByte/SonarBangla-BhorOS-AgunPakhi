@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // BhorOS user profile document. Each signed-in user can access only their own UID.
+    match /artifacts/{appId}/users/{userId} {
+      allow read, create, update, delete: if request.auth != null
+        && request.auth.uid == userId
+        && appId == "sonarbangla-bhoros";
+
+      // Installed eDokan/game metadata is stored in the user's games subcollection.
+      match /games/{gameId} {
+        allow read, create, update, delete: if request.auth != null
+          && request.auth.uid == userId
+          && appId == "sonarbangla-bhoros";
+      }
+    }
+  }
+}
